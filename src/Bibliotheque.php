@@ -3,7 +3,7 @@
 /**
  * Classe Bibliotheque : gere une collection de livres.
  *
- * Tableau prive de Livre. Methodes : ajouter, trouver, tous, compter, rechercher.
+ * Tableau prive de Livre. Methodes : ajouter, trouver, tous, compter, rechercher, statistiques.
  */
 class Bibliotheque
 {
@@ -68,36 +68,30 @@ class Bibliotheque
         }
         return $resultats;
     }
-    public function getStatistiquesCatalogue(): array {
-        $totalLivres = count($this->livres);
-        if ($totalLivres === 0) {
-            return [
-                'total' => 0,
-                'disponibles' => 0,
-                'empruntes' => 0,
-                'taux_disponibilite' => 0.0
-            ];
-        }
 
+    /**
+     * Retourne les statistiques du catalogue.
+     * @return array{total:int, disponibles:int, empruntes:int, auteurs_differents:int, taux_disponibilite:float}
+     */
+    public function statistiques(): array
+    {
+        $total = count($this->livres);
         $disponibles = 0;
+        $auteurs = [];
+
         foreach ($this->livres as $livre) {
-            if ($livre->isDisponible()) {
+            if ($livre->estDisponible()) {
                 $disponibles++;
             }
+            $auteurs[mb_strtolower(trim($livre->getAuteur()))] = true;
         }
 
-        $empruntes = $totalLivres - $disponibles;
-        $tauxDisponibilite = ($disponibles / $totalLivres) * 100;
-
         return [
-            'total' => $totalLivres,
-            'disponibles' => $disponibles,
-            'empruntes' => $empruntes,
-            'taux_disponibilite' => round($tauxDisponibilite, 2)
+            'total'              => $total,
+            'disponibles'        => $disponibles,
+            'empruntes'          => $total - $disponibles,
+            'auteurs_differents' => count($auteurs),
+            'taux_disponibilite' => $total === 0 ? 0.0 : round($disponibles / $total * 100, 2),
         ];
     }
-
 }
-
-
-        
