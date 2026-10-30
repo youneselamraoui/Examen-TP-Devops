@@ -73,7 +73,7 @@ class Bibliotheque
      * Retourne les statistiques du catalogue.
      * @return array{total:int, disponibles:int, empruntes:int, auteurs_differents:int, taux_disponibilite:float}
      */
-    public function statistiques(): array
+    public function statistiqus(): array
     {
         $total = count($this->livres);
         $disponibles = 0;
