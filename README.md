@@ -22,7 +22,6 @@ biblio/
     └── test_membre.php
 ```
 
-
 ## Contrat d'interface
 
 - **Livre** : `__construct(isbn, titre, auteur)`, `getIsbn()`, `getTitre()`, `getAuteur()`, `estDisponible()`, `emprunter()`, `rendre()`, `__toString()`
