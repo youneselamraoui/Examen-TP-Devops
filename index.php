@@ -3,7 +3,7 @@ require __DIR__ . '/autoload.php';
 
 /**
  * Menu interactif de la bibliotheque Biblio.
- * 1 Ajouter | 2 Lister | 3 Rechercher | 4 Emprunter | 5 Rendre | 0 Quitter
+ * 1 Ajouter | 2 Lister | 3 Rechercher | 4 Emprunter  | 5 Rendre | 0 Quitter
  */
 
 $bibliotheque = new Bibliotheque();
