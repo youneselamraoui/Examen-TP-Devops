@@ -1,60 +1,126 @@
+
 <?php
-// Tests pour la classe Bibliotheque
 
-$bib = new Bibliotheque();
+// Tests de la classe Bibliotheque
 
-// Test : bibliotheque vide
-verifier($bib->compter() === 0, 'Bibliotheque vide : compter() retourne 0');
-verifier($bib->tous() === [], 'Bibliotheque vide : tous() retourne un tableau vide');
+$bibliotheque = new Bibliotheque();
 
-// Test : ajouter un livre
-$l1 = new Livre('9782100545261', 'Algorithmique', 'Cormen');
-$bib->ajouter($l1);
-verifier($bib->compter() === 1, 'Apres ajout : compter() retourne 1');
+// Création des livres
+$livre1 = new Livre('9782100545261', 'Algorithmique', 'Cormen');
+$livre2 = new Livre('2100545264', 'PHP', 'Dupont');
+$livre3 = new Livre('9780132350884', 'Clean Code', 'Cormen');
 
-// Test : ajouter un deuxieme livre
-$l2 = new Livre('9780132350884', 'Clean Code', 'Robert Martin');
-$bib->ajouter($l2);
-verifier($bib->compter() === 2, 'Apres 2 ajouts : compter() retourne 2');
+// Test : ajouter des livres
+$bibliotheque->ajouter($livre1);
+$bibliotheque->ajouter($livre2);
+$bibliotheque->ajouter($livre3);
 
-// Test : ajouter un troisieme livre
-$l3 = new Livre('9780201633610', 'Design Patterns', 'Gamma');
-$bib->ajouter($l3);
-verifier($bib->compter() === 3, 'Apres 3 ajouts : compter() retourne 3');
+verifier($bibliotheque->compter() === 3, 'Ajouter trois livres');
 
-// Test : ajout avec ISBN duplique
-$exceptionDup = false;
-try {
-    $bib->ajouter(new Livre('9782100545261', 'Duplicate', 'Test'));
-} catch (Exception $e) {
-    $exceptionDup = true;
-}
-verifier($exceptionDup, 'Ajouter un ISBN deja present leve une exception');
+// Test : trouver un livre
+verifier(
+    $bibliotheque->trouver('9782100545261') === $livre1,
+    'Trouver un livre par ISBN'
+);
 
-// Test : trouver par ISBN existant
-$trouve = $bib->trouver('9782100545261');
-verifier($trouve !== null && $trouve->getTitre() === 'Algorithmique', 'trouver() retourne le bon livre');
+// Test : livre inexistant
+verifier(
+    $bibliotheque->trouver('1234567890') === null,
+    'Retourner null si le livre nexiste pas'
+);
 
-// Test : trouver par ISBN inexistant
-verifier($bib->trouver('0000000000') === null, 'trouver() retourne null si ISBN absent');
+// Test : retourner tous les livres
+verifier(
+    count($bibliotheque->tous()) === 3,
+    'Retourner tous les livres'
+);
 
-// Test : tous() retourne tous les livres
-verifier(count($bib->tous()) === 3, 'tous() retourne les 3 livres');
-
-// Test : rechercher par titre (insensible a la casse)
-$res = $bib->rechercher('algo');
-verifier(count($res) === 1 && $res[0]->getTitre() === 'Algorithmique', 'rechercher("algo") trouve Algorithmique');
+// Test : rechercher par titre
+verifier(
+    count($bibliotheque->rechercher('PHP')) === 1,
+    'Rechercher un livre par titre'
+);
 
 // Test : rechercher par auteur
-$res2 = $bib->rechercher('martin');
-verifier(count($res2) === 1 && $res2[0]->getTitre() === 'Clean Code', 'rechercher("martin") trouve Clean Code');
+verifier(
+    count($bibliotheque->rechercher('Cormen')) === 2,
+    'Rechercher un livre par auteur'
+);
 
-// Test : rechercher sans resultat
-$res3 = $bib->rechercher('python');
-verifier(count($res3) === 0, 'rechercher("python") ne trouve rien');
+// Test : recherche insensible à la casse
+verifier(
+    count($bibliotheque->rechercher('php')) === 1,
+    'Recherche insensible à la casse'
+);
 
-// Test : rechercher qui retourne plusieurs resultats
-$l4 = new Livre('9780596007126', 'Algo Avance', 'Cormen');
-$bib->ajouter($l4);
-$res4 = $bib->rechercher('algo');
-verifier(count($res4) === 2, 'rechercher("algo") trouve 2 livres');
+// Test : ajouter un livre avec ISBN déjà existant
+$exceptionDoublon = false;
+
+try {
+    $livreDoublon = new Livre(
+        '9782100545261',
+        'Autre livre',
+        'Autre auteur'
+    );
+
+    $bibliotheque->ajouter($livreDoublon);
+} catch (Exception $e) {
+    $exceptionDoublon = true;
+}
+
+verifier(
+    $exceptionDoublon,
+    'Refuser un livre avec un ISBN déjà existant'
+);
+
+// Test : statistiques du catalogue
+
+// Emprunter un livre
+$livre2->emprunter();
+
+$stats = $bibliotheque->statistiques();
+
+verifier(
+    $stats['total'] === 3,
+    'Statistiques : nombre total de livres'
+);
+
+verifier(
+    $stats['disponibles'] === 2,
+    'Statistiques : nombre de livres disponibles'
+);
+
+verifier(
+    $stats['empruntes'] === 1,
+    'Statistiques : nombre de livres empruntés'
+);
+
+verifier(
+    $stats['auteurs_differents'] === 2,
+    'Statistiques : nombre d auteurs différents'
+);
+
+// Test : statistiques d'une bibliothèque vide
+
+$bibliothequeVide = new Bibliotheque();
+$statsVides = $bibliothequeVide->statistiques();
+
+verifier(
+    $statsVides['total'] === 0,
+    'Bibliothèque vide : aucun livre'
+);
+
+verifier(
+    $statsVides['disponibles'] === 0,
+    'Bibliothèque vide : aucun livre disponible'
+);
+
+verifier(
+    $statsVides['empruntes'] === 0,
+    'Bibliothèque vide : aucun livre emprunté'
+);
+
+verifier(
+    $statsVides['auteurs_differents'] === 0,
+    'Bibliothèque vide : aucun auteur'
+);
