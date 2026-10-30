@@ -68,4 +68,36 @@ class Bibliotheque
         }
         return $resultats;
     }
+    public function getStatistiquesCatalogue(): array {
+        $totalLivres = count($this->livres);
+        if ($totalLivres === 0) {
+            return [
+                'total' => 0,
+                'disponibles' => 0,
+                'empruntes' => 0,
+                'taux_disponibilite' => 0.0
+            ];
+        }
+
+        $disponibles = 0;
+        foreach ($this->livres as $livre) {
+            if ($livre->isDisponible()) {
+                $disponibles++;
+            }
+        }
+
+        $empruntes = $totalLivres - $disponibles;
+        $tauxDisponibilite = ($disponibles / $totalLivres) * 100;
+
+        return [
+            'total' => $totalLivres,
+            'disponibles' => $disponibles,
+            'empruntes' => $empruntes,
+            'taux_disponibilite' => round($tauxDisponibilite, 2)
+        ];
+    }
+
 }
+
+
+        
